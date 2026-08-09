@@ -1,0 +1,20 @@
+# โมเดลที่เทรนแล้ว (ไฟล์ไบนารีขนาดใหญ่ ไม่ควรอยู่ใน git)
+*.pth
+*.joblib
+
+# ชุดข้อมูล
+*.csv
+all_augment_1M/
+all_augment_100K
+all_augment_6M/
+all_augment_OLD_6M_backup/
+data/
+
+# Python environment
+venv/
+__pycache__/
+*.pyc
+
+# archive ที่เคยสร้างไว้ก่อนหน้า
+*.tar.gz
+*.zip

@@ -1,0 +1,17 @@
+{
+  "resnet_path": "skin_cancer_best_resnet_1M.pth",
+  "densenet_path": "skin_cancer_best_densenet_1M.pth",
+  "vit_path": "skin_cancer_best_vit_1M_latest.pth",
+  "meta_classifier_path": "./ensemble_meta_classifier.joblib",
+  "classes": [
+    "akiec",
+    "bcc",
+    "bkl",
+    "df",
+    "mel",
+    "nv",
+    "vasc"
+  ],
+  "test_accuracy": 0.8584756413099727,
+  "test_macro_recall": 0.7737773273613839
+}

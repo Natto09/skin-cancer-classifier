@@ -1,0 +1,21 @@
+nohup: ignoring input
+Loading all augment/meta.csv ...
+Classes found (0): []
+Traceback (most recent call last):
+  File "/home/student/AI_Skin_Cancer_Project/train_resnet.py", line 324, in <module>
+    main()
+  File "/home/student/AI_Skin_Cancer_Project/train_resnet.py", line 189, in main
+    train_rows, val_rows, class_to_idx = load_meta_and_split(
+                                         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/student/AI_Skin_Cancer_Project/train_resnet.py", line 97, in load_meta_and_split
+    train_images, val_images = train_test_split(
+                               ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/sklearn/utils/_param_validation.py", line 213, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/sklearn/model_selection/_split.py", line 2660, in train_test_split
+    n_train, n_test = _validate_shuffle_split(
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/sklearn/model_selection/_split.py", line 2308, in _validate_shuffle_split
+    raise ValueError(
+ValueError: With n_samples=0, test_size=0.1 and train_size=None, the resulting train set will be empty. Adjust any of the aforementioned parameters.
