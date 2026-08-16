@@ -154,8 +154,48 @@ def three_way_split(per_image, val_fraction, test_fraction, seed):
     return set(train_images), set(val_images), set(test_images)
 
 
+def print_rows_per_image_diagnostic(df, group_col, filter_mask, label):
+    """Prints how many augmented rows exist per original_image, restricted to
+    rows where filter_mask is True. Purely informational -- run with --dry_run
+    to see this in seconds before committing to an --max_aug_per_image_noncancer
+    value, since guessing a cap blind could waste hours of training time."""
+    counts = df[filter_mask].groupby(group_col, observed=True).size()
+    if len(counts) == 0:
+        print(f"[diagnostic] No rows matched for '{label}'.")
+        return
+    pct = counts.quantile([0.25, 0.5, 0.75, 0.9, 0.99]).round(1)
+    print(f"[diagnostic] Rows per original_image for '{label}' "
+          f"({len(counts):,} original images, {counts.sum():,} total rows):")
+    print(f"    min={counts.min()}  p25={pct[0.25]}  median={pct[0.5]}  "
+          f"p75={pct[0.75]}  p90={pct[0.9]}  p99={pct[0.99]}  max={counts.max()}")
+
+
+def cap_rows_per_image(df, group_col, filter_mask, cap, seed):
+    """Randomly subsamples rows so at most `cap` rows survive per
+    original_image, but ONLY among rows where filter_mask is True. Rows
+    outside filter_mask (e.g. all "cancer" rows) are returned completely
+    untouched -- this is what makes the cap safe to use without risking
+    cancer recall: it only trims redundant duplicate views of the
+    majority/non-target class, never removes a single cancer-class row.
+    Does not change which original images fall into train/val/test (that's
+    decided by three_way_split on unique original_image, before this runs)
+    -- it only reduces how many augmented copies of each TRAIN image survive."""
+    if cap is None or cap <= 0:
+        return df
+    to_cap = df[filter_mask]
+    unchanged = df[~filter_mask]
+    capped = (to_cap.groupby(group_col, observed=True, group_keys=False)
+                     .apply(lambda g: g.sample(n=min(len(g), cap), random_state=seed)))
+    result = pd.concat([unchanged, capped], ignore_index=True)
+    print(f"[cap] '{group_col}' rows capped at {cap}/image for the filtered subset: "
+          f"{len(to_cap):,} -> {len(capped):,} rows ({len(to_cap) - len(capped):,} dropped). "
+          f"Untouched rows: {len(unchanged):,}. Total: {len(df):,} -> {len(result):,}.")
+    return result
+
+
 def load_meta_and_split(meta_csv, val_fraction, test_fraction, seed,
-                         metadata_csv=None, id_col="image_id", label_col="dx"):
+                         metadata_csv=None, id_col="image_id", label_col="dx",
+                         max_aug_per_image_noncancer=None, print_diagnostics=True):
     df = pd.read_csv(
         meta_csv, usecols=["filename", "original_image", "label"],
         dtype={"filename": "string", "original_image": "category", "label": "string"},
@@ -179,13 +219,44 @@ def load_meta_and_split(meta_csv, val_fraction, test_fraction, seed,
     val_df = df[df["original_image"].isin(val_images)]
     test_df = df[df["original_image"].isin(test_images)]
 
+    # --- optional overfitting fix: cap augmented-row redundancy for the
+    # non_cancer (majority) class in the TRAIN split only. val/test are left
+    # untouched since they should reflect the real class distribution for an
+    # honest generalization estimate. cancer-class train rows are NEVER
+    # touched by this, regardless of the cap value, by construction of the
+    # filter_mask below -- so this cannot reduce cancer-class training signal.
+    if print_diagnostics:
+        print_rows_per_image_diagnostic(
+            train_df, "original_image", train_df["gate_label"] == "non_cancer", "non_cancer (TRAIN)")
+        print_rows_per_image_diagnostic(
+            train_df, "original_image", train_df["gate_label"] == "cancer", "cancer (TRAIN, reference only)")
+
+    # --- capture PRE-CAP class counts before any capping happens, so the
+    # loss/sampler weighting in main() can be computed from the TRUE original
+    # class balance rather than the post-cap row counts. (This mirrors a fix
+    # applied to train_specialist_mel_bkl.py after v3 there showed that
+    # weighting from post-cap counts lets capping silently perturb the
+    # automatic inverse-frequency weight on top of cancer_class_weight's
+    # explicit boost -- an unintended interaction. Gate v2 happened to still
+    # improve despite this, but the calculation was decoupled here too so
+    # future capped runs are not exposed to the same risk.)
+    pre_cap_counts = train_df["gate_label"].map(gate_to_idx).value_counts().reindex(
+        range(len(gate_classes)), fill_value=0
+    ).sort_index().to_numpy()
+
+    if max_aug_per_image_noncancer:
+        train_df = cap_rows_per_image(
+            train_df, "original_image", train_df["gate_label"] == "non_cancer",
+            max_aug_per_image_noncancer, seed)
+
     train_rows = list(zip(train_df["filename"].tolist(),
                            train_df["gate_label"].map(gate_to_idx).tolist()))
     val_rows = list(zip(val_df["filename"].tolist(),
                          val_df["gate_label"].map(gate_to_idx).tolist()))
     test_rows = list(zip(test_df["filename"].tolist(),
                           test_df["gate_label"].map(gate_to_idx).tolist()))
-    return train_rows, val_rows, test_rows, gate_to_idx
+    return train_rows, val_rows, test_rows, gate_to_idx, pre_cap_counts
+
 
 
 # ---------------------------------------------------------------------------
@@ -281,6 +352,26 @@ def main():
                               "overconfidence/overfitting without meaningfully changing which class "
                               "the model favors -- unlike cancer_class_weight, it doesn't push the "
                               "decision boundary toward or away from 'cancer'. Set to 0 to disable.")
+    parser.add_argument("--max_aug_per_image_noncancer", type=int, default=None,
+                         help="Cap the number of augmented rows kept per original_image, applied "
+                              "ONLY to non_cancer (majority-class) TRAIN rows -- cancer-class rows "
+                              "are never touched, so this cannot cost cancer recall by construction. "
+                              "Targets overfitting at its likely source (many near-duplicate augmented "
+                              "views of the same majority-class photo) instead of via loss-level "
+                              "regularization, which measurably hurt recall in earlier runs. Run with "
+                              "--dry_run first to see real per-image row-count percentiles before "
+                              "picking a value.")
+    parser.add_argument("--dry_run", action="store_true",
+                         help="Print data/split diagnostics (including the row-per-image percentiles "
+                              "--max_aug_per_image_noncancer would act on) and exit WITHOUT loading a "
+                              "model or training. Takes seconds -- use this to pick a sensible cap "
+                              "value before committing hours of training time to a guess.")
+    parser.add_argument("--extra_augment", action="store_true",
+                         help="Add mild RandomRotation + ColorJitter to the training transforms, on "
+                              "top of the existing flips. Purely input-level (doesn't touch loss "
+                              "weights or which rows are sampled), so it shouldn't shift the "
+                              "cancer/non_cancer decision boundary the way weight_decay/label_smoothing "
+                              "did -- meant to reduce overfitting via more varied views instead.")
     parser.add_argument("--device", default=None,
                          help="Device to train on, e.g. 'cuda:0', 'cuda:1', or 'cpu'. "
                               "Defaults to cuda:0 if a GPU is available, else cpu. Set this "
@@ -314,9 +405,10 @@ def main():
                                    if multi_gpu_active else ""))
 
     print(f"Loading {args.meta_csv} and building gate (cancer/non-cancer) splits (seed={args.seed}) ...")
-    train_rows, val_rows, test_rows, gate_to_idx = load_meta_and_split(
+    train_rows, val_rows, test_rows, gate_to_idx, pre_cap_counts = load_meta_and_split(
         args.meta_csv, args.val_fraction, args.test_fraction, args.seed,
         metadata_csv=args.metadata_csv, id_col=args.id_col, label_col=args.label_col,
+        max_aug_per_image_noncancer=args.max_aug_per_image_noncancer,
     )
     idx_to_gate = {i: c for c, i in gate_to_idx.items()}
     num_classes = len(gate_to_idx)
@@ -326,16 +418,27 @@ def main():
 
     train_labels = np.array([r[1] for r in train_rows])
     class_counts = np.bincount(train_labels, minlength=num_classes)
-    print(f"Train class counts: cancer={class_counts[cancer_idx]:,}, "
+    print(f"Train class counts (post-cap, actual rows shown): cancer={class_counts[cancer_idx]:,}, "
           f"non_cancer={class_counts[1 - cancer_idx]:,}")
+    print(f"Train class counts (pre-cap, used for weighting): cancer={pre_cap_counts[cancer_idx]:,}, "
+          f"non_cancer={pre_cap_counts[1 - cancer_idx]:,}")
+
+    if args.dry_run:
+        print("\n[--dry_run] Diagnostics printed above -- exiting without loading a model or "
+              "training. Re-run without --dry_run (optionally with --max_aug_per_image_noncancer "
+              "set based on the percentiles above) to actually train.")
+        return
 
     # Inverse-frequency loss weights, with an extra manual boost on "cancer"
     # since missing a cancer case is far costlier than a false alarm.
-    raw_weights = class_counts.sum() / (num_classes * np.maximum(class_counts, 1))
+    # IMPORTANT: computed from pre_cap_counts (true original balance), not
+    # class_counts (post-cap row counts) -- see the note in
+    # load_meta_and_split for why this matters once capping is in play.
+    raw_weights = pre_cap_counts.sum() / (num_classes * np.maximum(pre_cap_counts, 1))
     loss_weights = raw_weights.copy()
     loss_weights[cancer_idx] *= args.cancer_class_weight
     class_weights_tensor = torch.tensor(loss_weights, dtype=torch.float32).to(device)
-    print(f"Loss weights: {dict(zip(idx_to_gate.values(), loss_weights.round(3)))}")
+    print(f"Loss weights (from pre-cap counts): {dict(zip(idx_to_gate.values(), loss_weights.round(3)))}")
 
     # Weighted sampler so the model sees "cancer" examples proportionally
     # more often during training too (not just via the loss weight).
@@ -344,13 +447,26 @@ def main():
     per_row_weights = np.array([sampler_weights[label] for _, label in train_rows])
     sampler = WeightedRandomSampler(weights=per_row_weights, num_samples=len(train_rows))
 
-    train_transforms = transforms.Compose([
+    train_transform_list = [
         transforms.Resize((224, 224)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
+    ]
+    if args.extra_augment:
+        # Mild on-the-fly extra views -- input-level only, doesn't touch loss
+        # weights or sampling, so it shouldn't shift the decision boundary the
+        # way weight_decay/label_smoothing did. Color jitter kept small since
+        # color is diagnostically relevant in dermoscopy images.
+        train_transform_list += [
+            transforms.RandomRotation(15),
+            transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.05),
+        ]
+        print("[--extra_augment] Added RandomRotation(15) + mild ColorJitter to train transforms.")
+    train_transform_list += [
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-    ])
+    ]
+    train_transforms = transforms.Compose(train_transform_list)
     eval_transforms = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),

@@ -39,11 +39,37 @@ check is kept as a secondary signal (specialist only helps decide *which*
 of the two, not whether it's one of the two at all). A diagnostic line
 reports how many specialist calls would have been "false triggers" under
 the old rule, for a direct before/after comparison.
+
+Confirmed on a real n=108135 re-run: this fix removed 626 specialist
+invocations, of which 584 were former false triggers (93%) -- the fix
+behaves as designed. But accuracy only moved +0.49pp and mel/bkl precision
+barely moved (mel 0.149->0.164, bkl 0.257->0.263). The remaining false
+triggers (2,528 of 3,719, i.e. 68%) are no longer a trigger-rule artifact --
+they're now cases where the ensemble's OWN prediction already landed on
+mel/bkl for a genuinely different true class. Prime suspect: severe class
+imbalance in the eval set itself (nv = 90,585 of 108,135 rows = 83.8%, vs
+mel+bkl = 2,700 combined = 2.5%) -- even a tiny nv-misclassified-as-mel/bkl
+rate from the base ensemble produces large absolute false-positive counts
+simply because nv's base is so huge.
+
+*** THIS VERSION adds two more things ***
+1. A breakdown of the remaining false triggers by true label (a Counter),
+   to confirm/refute the "it's mostly nv" hypothesis with real numbers
+   instead of a guess.
+2. The mel-vs-bkl decision now blends the specialist's own probability
+   with the gate model's cancer-probability signal (mel is "cancer",
+   bkl is "non_cancer" -- the gate's binary split lines up with this
+   distinction exactly), instead of relying on the specialist alone. This
+   doesn't touch WHETHER the specialist fires (still gated on
+   ensemble_preds as above) -- only which of {mel, bkl} it picks once
+   triggered. Default blend weight is 0.7 specialist / 0.3 gate, tunable
+   via --gate_blend_weight.
 """
 
 import argparse
 import json
 import os
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import joblib
@@ -219,6 +245,16 @@ def main():
                          help="Skip the specialist override entirely (ensemble_preds "
                               "become final_preds unchanged). Use for before/after "
                               "comparisons on the identical clean subset.")
+
+    # NEW: once the specialist is triggered, blend its mel-probability with
+    # the gate's cancer-probability instead of trusting the specialist
+    # alone. mel is a "cancer" class and bkl is "non_cancer" for gate
+    # purposes, so gate_cancer_prob is a second, independently-trained
+    # opinion on the same mel-vs-bkl question.
+    parser.add_argument("--gate_blend_weight", type=float, default=0.3,
+                         help="Weight given to the gate's cancer-probability when deciding "
+                              "mel vs bkl for specialist-triggered rows (0 = specialist only, "
+                              "1 = gate only). Default 0.3.")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -374,7 +410,13 @@ def main():
         ensemble_says_mel_bkl = ensemble_preds[i] in (mel_idx, bkl_idx)
         if ensemble_says_mel_bkl and avg_probs_say_mel_bkl:
             specialist_used[i] = True
-            final_preds[i] = mel_idx if specialist_probs_full[i, 1] > specialist_probs_full[i, 0] else bkl_idx
+            # Blend the specialist's own mel-probability with the gate's
+            # cancer-probability (mel=cancer, bkl=non_cancer) instead of
+            # trusting the specialist in isolation -- two independently
+            # trained models voting on the same mel-vs-bkl question.
+            w = args.gate_blend_weight
+            blended_mel_score = (1 - w) * specialist_probs_full[i, 1] + w * gate_cancer_prob[i]
+            final_preds[i] = mel_idx if blended_mel_score > 0.5 else bkl_idx
 
         pred_is_cancer = classes[final_preds[i]] in CANCER_CLASSES
         if gate_cancer_prob[i] >= args.gate_cancer_threshold and not pred_is_cancer:
@@ -406,8 +448,23 @@ def main():
           f"{old_rule_used.sum()} rows, of which {old_rule_false_triggers.sum()} had a true "
           f"label that isn't mel/bkl (guaranteed-wrong forced calls).")
     print(f"[diagnostic] New rule (this fix) invoked specialist on {specialist_used.sum()} rows, "
-          f"of which {new_rule_false_triggers.sum()} had a true label that isn't mel/bkl "
-          f"(should be 0 or very close to it).")
+          f"of which {new_rule_false_triggers.sum()} had a true label that isn't mel/bkl. "
+          f"NOTE: this number is no longer a trigger-rule bug -- under the fixed rule it can only "
+          f"happen when the ensemble's OWN prediction already landed on mel/bkl for a genuinely "
+          f"different true class, i.e. it reflects the base ensemble's real error rate on these rows.")
+
+    # Breakdown of the remaining false triggers by true label -- tests the
+    # hypothesis that this is mostly a class-imbalance effect (a small
+    # nv-misclassified-as-mel/bkl rate producing a large absolute count
+    # simply because nv's base is so much bigger than every other class).
+    if new_rule_false_triggers.sum() > 0:
+        idx_to_class = {v: k for k, v in class_to_idx.items()}
+        false_trigger_true_labels = [idx_to_class[idx] for idx in y_true[new_rule_false_triggers]]
+        breakdown = Counter(false_trigger_true_labels)
+        print("\n[diagnostic] Remaining false triggers broken down by TRUE label:")
+        for cls, count in breakdown.most_common():
+            pct = 100 * count / new_rule_false_triggers.sum()
+            print(f"    {cls:>6}: {count:>5} ({pct:.1f}% of all remaining false triggers)")
 
     print("\nPER-CLASS REPORT:")
     print(classification_report(y_true, final_preds, target_names=classes, digits=3))
