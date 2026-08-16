@@ -1,0 +1,49 @@
+{
+  "metadata_csv": "data/ham10000/HAM10000_metadata.csv",
+  "id_col": "image_id",
+  "label_col": "dx",
+  "val_fraction": 0.15,
+  "test_fraction": 0.1,
+  "seed": 42,
+  "meta_csv": "all_augment_1M/lowmeta.csv",
+  "batch_size": 64,
+  "epochs": 30,
+  "workers": 8,
+  "lr": 0.0001,
+  "weight_decay": 0.01,
+  "optimizer_type": "adamw",
+  "patience": 5,
+  "lr_schedule": "none",
+  "lr_step_size": 5,
+  "augmentation_level": "basic",
+  "loss_type": "ce",
+  "focal_gamma": 2.0,
+  "label_smoothing": 0.05,
+  "class_weight_power": 1.0,
+  "sampler_weight_power": 1.0,
+  "class_weighted_loss": true,
+  "oversample_minority": true,
+  "use_amp": false,
+  "auto_batch_size": false,
+  "probe_max_batch": 2048,
+  "gpu_ids": null,
+  "multi_gpu": false,
+  "resume": false,
+  "checkpoint_every_steps": 0,
+  "log_every": 50,
+  "split_mode": "gate",
+  "cancer_classes": [
+    "mel",
+    "bcc",
+    "akiec"
+  ],
+  "target_classes": [],
+  "extra_class_weight": {
+    "cancer": 3.0
+  },
+  "priority_classes": [
+    "cancer"
+  ],
+  "best_model_path": "skin_cancer_best_gate_1M.pth",
+  "checkpoint_path": "train_checkpoint_gate_1M.pth"
+}

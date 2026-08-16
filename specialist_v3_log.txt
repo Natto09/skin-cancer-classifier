@@ -1,0 +1,249 @@
+Device: cuda:0 (DataParallel across 2 GPUs)
+Loading all_augment_1M/lowmeta.csv, filtering to ['bkl', 'mel'], building splits (seed=42) ...
+[diagnostic] Rows per original_image for 'bkl (TRAIN)' (824 original images, 111,240 total rows):
+    min=135  p25=135.0  median=135.0  p75=135.0  p90=135.0  p99=135.0  max=135
+[diagnostic] Rows per original_image for 'mel (TRAIN)' (834 original images, 112,590 total rows):
+    min=135  p25=135.0  median=135.0  p75=135.0  p90=135.0  p99=135.0  max=135
+[cap] 'original_image' rows capped at 70/image for the filtered subset: 111,240 -> 57,680 rows (53,560 dropped). Untouched rows: 112,590. Total: 223,830 -> 170,270.
+Train: 170,270 | Val: 44,820 | Test: 29,970 | Classes: {'bkl': 0, 'mel': 1}
+Train class counts: {'bkl': 57680, 'mel': 112590}
+Loss weights: {'bkl': 1.476, 'mel': 1.512}
+[--extra_augment] Added RandomRotation(15) + mild ColorJitter to train transforms.
+Regularization: weight_decay=0.0, label_smoothing=0.0
+[EPOCH 1] step 50/1331 (3.8%) | loss: 0.6745 acc: 64.41%
+[EPOCH 1] step 100/1331 (7.5%) | loss: 0.5581 acc: 72.80%
+[EPOCH 1] step 150/1331 (11.3%) | loss: 0.4833 acc: 77.47%
+[EPOCH 1] step 200/1331 (15.0%) | loss: 0.4313 acc: 80.51%
+[EPOCH 1] step 250/1331 (18.8%) | loss: 0.3895 acc: 82.78%
+[EPOCH 1] step 300/1331 (22.5%) | loss: 0.3551 acc: 84.65%
+[EPOCH 1] step 350/1331 (26.3%) | loss: 0.3300 acc: 85.93%
+[EPOCH 1] step 400/1331 (30.1%) | loss: 0.3060 acc: 87.15%
+[EPOCH 1] step 450/1331 (33.8%) | loss: 0.2842 acc: 88.22%
+[EPOCH 1] step 500/1331 (37.6%) | loss: 0.2666 acc: 89.05%
+[EPOCH 1] step 550/1331 (41.3%) | loss: 0.2509 acc: 89.80%
+[EPOCH 1] step 600/1331 (45.1%) | loss: 0.2368 acc: 90.45%
+[EPOCH 1] step 650/1331 (48.8%) | loss: 0.2242 acc: 91.04%
+[EPOCH 1] step 700/1331 (52.6%) | loss: 0.2134 acc: 91.54%
+[EPOCH 1] step 750/1331 (56.3%) | loss: 0.2030 acc: 92.02%
+[EPOCH 1] step 800/1331 (60.1%) | loss: 0.1932 acc: 92.45%
+[EPOCH 1] step 850/1331 (63.9%) | loss: 0.1852 acc: 92.81%
+[EPOCH 1] step 900/1331 (67.6%) | loss: 0.1778 acc: 93.12%
+[EPOCH 1] step 950/1331 (71.4%) | loss: 0.1707 acc: 93.43%
+[EPOCH 1] step 1000/1331 (75.1%) | loss: 0.1645 acc: 93.69%
+[EPOCH 1] step 1050/1331 (78.9%) | loss: 0.1585 acc: 93.94%
+[EPOCH 1] step 1100/1331 (82.6%) | loss: 0.1528 acc: 94.17%
+[EPOCH 1] step 1150/1331 (86.4%) | loss: 0.1476 acc: 94.39%
+[EPOCH 1] step 1200/1331 (90.2%) | loss: 0.1427 acc: 94.60%
+[EPOCH 1] step 1250/1331 (93.9%) | loss: 0.1384 acc: 94.78%
+[EPOCH 1] step 1300/1331 (97.7%) | loss: 0.1343 acc: 94.95%
+[EPOCH 1] step 1331/1331 (100.0%) | loss: 0.1320 acc: 95.05%
+[EPOCH 1] done in 17.2m -- Train Acc: 95.05% | Val Acc: 86.50% | Val mel Recall: 0.8865
+  -> new best (val mel recall = 0.8865), saved to skin_cancer_best_specialist_mel_bkl_1M_v3.pth
+[EPOCH 2] step 50/1331 (3.8%) | loss: 0.0326 acc: 99.14%
+[EPOCH 2] step 100/1331 (7.5%) | loss: 0.0334 acc: 99.12%
+[EPOCH 2] step 150/1331 (11.3%) | loss: 0.0296 acc: 99.26%
+[EPOCH 2] step 200/1331 (15.0%) | loss: 0.0288 acc: 99.27%
+[EPOCH 2] step 250/1331 (18.8%) | loss: 0.0296 acc: 99.24%
+[EPOCH 2] step 300/1331 (22.5%) | loss: 0.0280 acc: 99.30%
+[EPOCH 2] step 350/1331 (26.3%) | loss: 0.0267 acc: 99.34%
+[EPOCH 2] step 400/1331 (30.1%) | loss: 0.0271 acc: 99.33%
+[EPOCH 2] step 450/1331 (33.8%) | loss: 0.0265 acc: 99.34%
+[EPOCH 2] step 500/1331 (37.6%) | loss: 0.0261 acc: 99.34%
+[EPOCH 2] step 550/1331 (41.3%) | loss: 0.0257 acc: 99.36%
+[EPOCH 2] step 600/1331 (45.1%) | loss: 0.0255 acc: 99.36%
+[EPOCH 2] step 650/1331 (48.8%) | loss: 0.0252 acc: 99.36%
+[EPOCH 2] step 700/1331 (52.6%) | loss: 0.0245 acc: 99.38%
+[EPOCH 2] step 750/1331 (56.3%) | loss: 0.0241 acc: 99.38%
+[EPOCH 2] step 800/1331 (60.1%) | loss: 0.0238 acc: 99.39%
+[EPOCH 2] step 850/1331 (63.9%) | loss: 0.0238 acc: 99.39%
+[EPOCH 2] step 900/1331 (67.6%) | loss: 0.0234 acc: 99.40%
+[EPOCH 2] step 950/1331 (71.4%) | loss: 0.0228 acc: 99.41%
+[EPOCH 2] step 1000/1331 (75.1%) | loss: 0.0220 acc: 99.44%
+[EPOCH 2] step 1050/1331 (78.9%) | loss: 0.0214 acc: 99.46%
+[EPOCH 2] step 1100/1331 (82.6%) | loss: 0.0218 acc: 99.44%
+[EPOCH 2] step 1150/1331 (86.4%) | loss: 0.0218 acc: 99.44%
+[EPOCH 2] step 1200/1331 (90.2%) | loss: 0.0215 acc: 99.44%
+[EPOCH 2] step 1250/1331 (93.9%) | loss: 0.0214 acc: 99.44%
+[EPOCH 2] step 1300/1331 (97.7%) | loss: 0.0212 acc: 99.44%
+[EPOCH 2] step 1331/1331 (100.0%) | loss: 0.0210 acc: 99.44%
+[EPOCH 2] done in 15.8m -- Train Acc: 99.44% | Val Acc: 88.26% | Val mel Recall: 0.8936
+  -> new best (val mel recall = 0.8936), saved to skin_cancer_best_specialist_mel_bkl_1M_v3.pth
+[EPOCH 3] step 50/1331 (3.8%) | loss: 0.0133 acc: 99.64%
+[EPOCH 3] step 100/1331 (7.5%) | loss: 0.0140 acc: 99.62%
+[EPOCH 3] step 150/1331 (11.3%) | loss: 0.0115 acc: 99.72%
+[EPOCH 3] step 200/1331 (15.0%) | loss: 0.0097 acc: 99.78%
+[EPOCH 3] step 250/1331 (18.8%) | loss: 0.0096 acc: 99.76%
+[EPOCH 3] step 300/1331 (22.5%) | loss: 0.0109 acc: 99.72%
+[EPOCH 3] step 350/1331 (26.3%) | loss: 0.0105 acc: 99.73%
+[EPOCH 3] step 400/1331 (30.1%) | loss: 0.0098 acc: 99.75%
+[EPOCH 3] step 450/1331 (33.8%) | loss: 0.0094 acc: 99.77%
+[EPOCH 3] step 500/1331 (37.6%) | loss: 0.0090 acc: 99.78%
+[EPOCH 3] step 550/1331 (41.3%) | loss: 0.0091 acc: 99.78%
+[EPOCH 3] step 600/1331 (45.1%) | loss: 0.0099 acc: 99.76%
+[EPOCH 3] step 650/1331 (48.8%) | loss: 0.0101 acc: 99.75%
+[EPOCH 3] step 700/1331 (52.6%) | loss: 0.0103 acc: 99.74%
+[EPOCH 3] step 750/1331 (56.3%) | loss: 0.0104 acc: 99.73%
+[EPOCH 3] step 800/1331 (60.1%) | loss: 0.0104 acc: 99.74%
+[EPOCH 3] step 850/1331 (63.9%) | loss: 0.0102 acc: 99.74%
+[EPOCH 3] step 900/1331 (67.6%) | loss: 0.0103 acc: 99.73%
+[EPOCH 3] step 950/1331 (71.4%) | loss: 0.0104 acc: 99.73%
+[EPOCH 3] step 1000/1331 (75.1%) | loss: 0.0106 acc: 99.72%
+[EPOCH 3] step 1050/1331 (78.9%) | loss: 0.0105 acc: 99.73%
+[EPOCH 3] step 1100/1331 (82.6%) | loss: 0.0103 acc: 99.73%
+[EPOCH 3] step 1150/1331 (86.4%) | loss: 0.0102 acc: 99.74%
+[EPOCH 3] step 1200/1331 (90.2%) | loss: 0.0102 acc: 99.73%
+[EPOCH 3] step 1250/1331 (93.9%) | loss: 0.0100 acc: 99.74%
+[EPOCH 3] step 1300/1331 (97.7%) | loss: 0.0101 acc: 99.73%
+[EPOCH 3] step 1331/1331 (100.0%) | loss: 0.0101 acc: 99.73%
+[EPOCH 3] done in 14.8m -- Train Acc: 99.73% | Val Acc: 86.26% | Val mel Recall: 0.9227
+  -> new best (val mel recall = 0.9227), saved to skin_cancer_best_specialist_mel_bkl_1M_v3.pth
+[EPOCH 4] step 50/1331 (3.8%) | loss: 0.0095 acc: 99.67%
+[EPOCH 4] step 100/1331 (7.5%) | loss: 0.0131 acc: 99.58%
+[EPOCH 4] step 150/1331 (11.3%) | loss: 0.0119 acc: 99.62%
+[EPOCH 4] step 200/1331 (15.0%) | loss: 0.0124 acc: 99.59%
+[EPOCH 4] step 250/1331 (18.8%) | loss: 0.0119 acc: 99.61%
+[EPOCH 4] step 300/1331 (22.5%) | loss: 0.0111 acc: 99.65%
+[EPOCH 4] step 350/1331 (26.3%) | loss: 0.0111 acc: 99.66%
+[EPOCH 4] step 400/1331 (30.1%) | loss: 0.0114 acc: 99.65%
+[EPOCH 4] step 450/1331 (33.8%) | loss: 0.0113 acc: 99.65%
+[EPOCH 4] step 500/1331 (37.6%) | loss: 0.0108 acc: 99.67%
+[EPOCH 4] step 550/1331 (41.3%) | loss: 0.0100 acc: 99.70%
+[EPOCH 4] step 600/1331 (45.1%) | loss: 0.0097 acc: 99.72%
+[EPOCH 4] step 650/1331 (48.8%) | loss: 0.0094 acc: 99.72%
+[EPOCH 4] step 700/1331 (52.6%) | loss: 0.0093 acc: 99.73%
+[EPOCH 4] step 750/1331 (56.3%) | loss: 0.0091 acc: 99.73%
+[EPOCH 4] step 800/1331 (60.1%) | loss: 0.0090 acc: 99.73%
+[EPOCH 4] step 850/1331 (63.9%) | loss: 0.0091 acc: 99.73%
+[EPOCH 4] step 900/1331 (67.6%) | loss: 0.0092 acc: 99.73%
+[EPOCH 4] step 950/1331 (71.4%) | loss: 0.0091 acc: 99.74%
+[EPOCH 4] step 1000/1331 (75.1%) | loss: 0.0089 acc: 99.74%
+[EPOCH 4] step 1050/1331 (78.9%) | loss: 0.0086 acc: 99.75%
+[EPOCH 4] step 1100/1331 (82.6%) | loss: 0.0083 acc: 99.76%
+[EPOCH 4] step 1150/1331 (86.4%) | loss: 0.0081 acc: 99.77%
+[EPOCH 4] step 1200/1331 (90.2%) | loss: 0.0081 acc: 99.77%
+[EPOCH 4] step 1250/1331 (93.9%) | loss: 0.0080 acc: 99.77%
+[EPOCH 4] step 1300/1331 (97.7%) | loss: 0.0081 acc: 99.77%
+[EPOCH 4] step 1331/1331 (100.0%) | loss: 0.0081 acc: 99.77%
+[EPOCH 4] done in 14.0m -- Train Acc: 99.77% | Val Acc: 89.07% | Val mel Recall: 0.9054
+[EPOCH 5] step 50/1331 (3.8%) | loss: 0.0083 acc: 99.73%
+[EPOCH 5] step 100/1331 (7.5%) | loss: 0.0057 acc: 99.84%
+[EPOCH 5] step 150/1331 (11.3%) | loss: 0.0057 acc: 99.84%
+[EPOCH 5] step 200/1331 (15.0%) | loss: 0.0051 acc: 99.86%
+[EPOCH 5] step 250/1331 (18.8%) | loss: 0.0056 acc: 99.84%
+[EPOCH 5] step 300/1331 (22.5%) | loss: 0.0070 acc: 99.79%
+[EPOCH 5] step 350/1331 (26.3%) | loss: 0.0084 acc: 99.74%
+[EPOCH 5] step 400/1331 (30.1%) | loss: 0.0088 acc: 99.74%
+[EPOCH 5] step 450/1331 (33.8%) | loss: 0.0099 acc: 99.70%
+[EPOCH 5] step 500/1331 (37.6%) | loss: 0.0095 acc: 99.71%
+[EPOCH 5] step 550/1331 (41.3%) | loss: 0.0090 acc: 99.73%
+[EPOCH 5] step 600/1331 (45.1%) | loss: 0.0085 acc: 99.74%
+[EPOCH 5] step 650/1331 (48.8%) | loss: 0.0081 acc: 99.76%
+[EPOCH 5] step 700/1331 (52.6%) | loss: 0.0077 acc: 99.77%
+[EPOCH 5] step 750/1331 (56.3%) | loss: 0.0080 acc: 99.77%
+[EPOCH 5] step 800/1331 (60.1%) | loss: 0.0084 acc: 99.75%
+[EPOCH 5] step 850/1331 (63.9%) | loss: 0.0085 acc: 99.75%
+[EPOCH 5] step 900/1331 (67.6%) | loss: 0.0085 acc: 99.74%
+[EPOCH 5] step 950/1331 (71.4%) | loss: 0.0082 acc: 99.75%
+[EPOCH 5] step 1000/1331 (75.1%) | loss: 0.0078 acc: 99.77%
+[EPOCH 5] step 1050/1331 (78.9%) | loss: 0.0076 acc: 99.77%
+[EPOCH 5] step 1100/1331 (82.6%) | loss: 0.0075 acc: 99.77%
+[EPOCH 5] step 1150/1331 (86.4%) | loss: 0.0073 acc: 99.78%
+[EPOCH 5] step 1200/1331 (90.2%) | loss: 0.0075 acc: 99.77%
+[EPOCH 5] step 1250/1331 (93.9%) | loss: 0.0076 acc: 99.77%
+[EPOCH 5] step 1300/1331 (97.7%) | loss: 0.0076 acc: 99.77%
+[EPOCH 5] step 1331/1331 (100.0%) | loss: 0.0075 acc: 99.77%
+[EPOCH 5] done in 13.5m -- Train Acc: 99.77% | Val Acc: 87.76% | Val mel Recall: 0.8566
+[EPOCH 6] step 50/1331 (3.8%) | loss: 0.0074 acc: 99.78%
+[EPOCH 6] step 100/1331 (7.5%) | loss: 0.0085 acc: 99.73%
+[EPOCH 6] step 150/1331 (11.3%) | loss: 0.0070 acc: 99.79%
+[EPOCH 6] step 200/1331 (15.0%) | loss: 0.0061 acc: 99.82%
+[EPOCH 6] step 250/1331 (18.8%) | loss: 0.0060 acc: 99.82%
+[EPOCH 6] step 300/1331 (22.5%) | loss: 0.0058 acc: 99.83%
+[EPOCH 6] step 350/1331 (26.3%) | loss: 0.0056 acc: 99.83%
+[EPOCH 6] step 400/1331 (30.1%) | loss: 0.0056 acc: 99.84%
+[EPOCH 6] step 450/1331 (33.8%) | loss: 0.0054 acc: 99.85%
+[EPOCH 6] step 500/1331 (37.6%) | loss: 0.0050 acc: 99.86%
+[EPOCH 6] step 550/1331 (41.3%) | loss: 0.0047 acc: 99.87%
+[EPOCH 6] step 600/1331 (45.1%) | loss: 0.0044 acc: 99.88%
+[EPOCH 6] step 650/1331 (48.8%) | loss: 0.0041 acc: 99.89%
+[EPOCH 6] step 700/1331 (52.6%) | loss: 0.0038 acc: 99.90%
+[EPOCH 6] step 750/1331 (56.3%) | loss: 0.0036 acc: 99.90%
+[EPOCH 6] step 800/1331 (60.1%) | loss: 0.0039 acc: 99.89%
+[EPOCH 6] step 850/1331 (63.9%) | loss: 0.0040 acc: 99.89%
+[EPOCH 6] step 900/1331 (67.6%) | loss: 0.0045 acc: 99.88%
+[EPOCH 6] step 950/1331 (71.4%) | loss: 0.0045 acc: 99.87%
+[EPOCH 6] step 1000/1331 (75.1%) | loss: 0.0046 acc: 99.87%
+[EPOCH 6] step 1050/1331 (78.9%) | loss: 0.0051 acc: 99.85%
+[EPOCH 6] step 1100/1331 (82.6%) | loss: 0.0055 acc: 99.84%
+[EPOCH 6] step 1150/1331 (86.4%) | loss: 0.0055 acc: 99.83%
+[EPOCH 6] step 1200/1331 (90.2%) | loss: 0.0055 acc: 99.84%
+[EPOCH 6] step 1250/1331 (93.9%) | loss: 0.0054 acc: 99.84%
+[EPOCH 6] step 1300/1331 (97.7%) | loss: 0.0054 acc: 99.84%
+[EPOCH 6] step 1331/1331 (100.0%) | loss: 0.0054 acc: 99.84%
+[EPOCH 6] done in 13.4m -- Train Acc: 99.84% | Val Acc: 87.03% | Val mel Recall: 0.9210
+[EPOCH 7] step 50/1331 (3.8%) | loss: 0.0042 acc: 99.86%
+[EPOCH 7] step 100/1331 (7.5%) | loss: 0.0079 acc: 99.81%
+[EPOCH 7] step 150/1331 (11.3%) | loss: 0.0081 acc: 99.78%
+[EPOCH 7] step 200/1331 (15.0%) | loss: 0.0071 acc: 99.81%
+[EPOCH 7] step 250/1331 (18.8%) | loss: 0.0060 acc: 99.84%
+[EPOCH 7] step 300/1331 (22.5%) | loss: 0.0056 acc: 99.85%
+[EPOCH 7] step 350/1331 (26.3%) | loss: 0.0053 acc: 99.85%
+[EPOCH 7] step 400/1331 (30.1%) | loss: 0.0056 acc: 99.84%
+[EPOCH 7] step 450/1331 (33.8%) | loss: 0.0059 acc: 99.82%
+[EPOCH 7] step 500/1331 (37.6%) | loss: 0.0058 acc: 99.83%
+[EPOCH 7] step 550/1331 (41.3%) | loss: 0.0056 acc: 99.83%
+[EPOCH 7] step 600/1331 (45.1%) | loss: 0.0053 acc: 99.84%
+[EPOCH 7] step 650/1331 (48.8%) | loss: 0.0052 acc: 99.85%
+[EPOCH 7] step 700/1331 (52.6%) | loss: 0.0051 acc: 99.85%
+[EPOCH 7] step 750/1331 (56.3%) | loss: 0.0055 acc: 99.84%
+[EPOCH 7] step 800/1331 (60.1%) | loss: 0.0057 acc: 99.84%
+[EPOCH 7] step 850/1331 (63.9%) | loss: 0.0058 acc: 99.84%
+[EPOCH 7] step 900/1331 (67.6%) | loss: 0.0058 acc: 99.84%
+[EPOCH 7] step 950/1331 (71.4%) | loss: 0.0056 acc: 99.84%
+[EPOCH 7] step 1000/1331 (75.1%) | loss: 0.0055 acc: 99.84%
+[EPOCH 7] step 1050/1331 (78.9%) | loss: 0.0054 acc: 99.85%
+[EPOCH 7] step 1100/1331 (82.6%) | loss: 0.0052 acc: 99.85%
+[EPOCH 7] step 1150/1331 (86.4%) | loss: 0.0050 acc: 99.86%
+[EPOCH 7] step 1200/1331 (90.2%) | loss: 0.0049 acc: 99.86%
+[EPOCH 7] step 1250/1331 (93.9%) | loss: 0.0047 acc: 99.87%
+[EPOCH 7] step 1300/1331 (97.7%) | loss: 0.0046 acc: 99.87%
+[EPOCH 7] step 1331/1331 (100.0%) | loss: 0.0045 acc: 99.88%
+[EPOCH 7] done in 13.7m -- Train Acc: 99.88% | Val Acc: 87.31% | Val mel Recall: 0.8827
+[EPOCH 8] step 50/1331 (3.8%) | loss: 0.0021 acc: 99.92%
+[EPOCH 8] step 100/1331 (7.5%) | loss: 0.0161 acc: 99.57%
+[EPOCH 8] step 150/1331 (11.3%) | loss: 0.0175 acc: 99.53%
+[EPOCH 8] step 200/1331 (15.0%) | loss: 0.0145 acc: 99.61%
+[EPOCH 8] step 250/1331 (18.8%) | loss: 0.0119 acc: 99.68%
+[EPOCH 8] step 300/1331 (22.5%) | loss: 0.0103 acc: 99.73%
+[EPOCH 8] step 350/1331 (26.3%) | loss: 0.0091 acc: 99.76%
+[EPOCH 8] step 400/1331 (30.1%) | loss: 0.0082 acc: 99.79%
+[EPOCH 8] step 450/1331 (33.8%) | loss: 0.0074 acc: 99.80%
+[EPOCH 8] step 500/1331 (37.6%) | loss: 0.0070 acc: 99.81%
+[EPOCH 8] step 550/1331 (41.3%) | loss: 0.0065 acc: 99.82%
+[EPOCH 8] step 600/1331 (45.1%) | loss: 0.0062 acc: 99.83%
+[EPOCH 8] step 650/1331 (48.8%) | loss: 0.0059 acc: 99.84%
+[EPOCH 8] step 700/1331 (52.6%) | loss: 0.0056 acc: 99.85%
+[EPOCH 8] step 750/1331 (56.3%) | loss: 0.0053 acc: 99.85%
+[EPOCH 8] step 800/1331 (60.1%) | loss: 0.0051 acc: 99.86%
+[EPOCH 8] step 850/1331 (63.9%) | loss: 0.0048 acc: 99.87%
+[EPOCH 8] step 900/1331 (67.6%) | loss: 0.0046 acc: 99.88%
+[EPOCH 8] step 950/1331 (71.4%) | loss: 0.0044 acc: 99.88%
+[EPOCH 8] step 1000/1331 (75.1%) | loss: 0.0042 acc: 99.89%
+[EPOCH 8] step 1050/1331 (78.9%) | loss: 0.0040 acc: 99.89%
+[EPOCH 8] step 1100/1331 (82.6%) | loss: 0.0038 acc: 99.90%
+[EPOCH 8] step 1150/1331 (86.4%) | loss: 0.0037 acc: 99.90%
+[EPOCH 8] step 1200/1331 (90.2%) | loss: 0.0035 acc: 99.91%
+[EPOCH 8] step 1250/1331 (93.9%) | loss: 0.0034 acc: 99.91%
+[EPOCH 8] step 1300/1331 (97.7%) | loss: 0.0035 acc: 99.91%
+[EPOCH 8] step 1331/1331 (100.0%) | loss: 0.0039 acc: 99.90%
+[EPOCH 8] done in 14.3m -- Train Acc: 99.90% | Val Acc: 86.04% | Val mel Recall: 0.9065
+Early stopping triggered at epoch 8 (no val mel-recall improvement for 5 epochs)
+Training complete. Total time: 116.67 minutes
+Loading best checkpoint (skin_cancer_best_specialist_mel_bkl_1M_v3.pth) for final test evaluation ...
+
+============================================================
+FINAL TEST RESULTS -- MEL-VS-BKL SPECIALIST
+============================================================
+  Test Accuracy: 86.86%
+     bkl recall: 0.8064
+     mel recall: 0.9298

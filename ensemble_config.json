@@ -1,7 +1,14 @@
 {
-  "resnet_path": "skin_cancer_best_resnet_1M.pth",
-  "densenet_path": "skin_cancer_best_densenet_1M.pth",
-  "vit_path": "skin_cancer_best_vit_1M_latest.pth",
+  "backbone_order": [
+    "resnet50",
+    "densenet121",
+    "vit_b16"
+  ],
+  "weight_paths": {
+    "resnet50": "skin_cancer_best_resnet_1M.pth",
+    "densenet121": "skin_cancer_best_densenet_1M.pth",
+    "vit_b16": "skin_cancer_best_vit_1M.pth"
+  },
   "meta_classifier_path": "./ensemble_meta_classifier.joblib",
   "classes": [
     "akiec",
@@ -12,6 +19,9 @@
     "nv",
     "vasc"
   ],
-  "test_accuracy": 0.8584756413099727,
-  "test_macro_recall": 0.7737773273613839
+  "test_accuracy": 0.8563465661270052,
+  "test_macro_recall": 0.7639790337053505,
+  "resnet_path": "skin_cancer_best_resnet_1M.pth",
+  "densenet_path": "skin_cancer_best_densenet_1M.pth",
+  "vit_path": "skin_cancer_best_vit_1M.pth"
 }

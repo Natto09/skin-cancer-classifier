@@ -1,0 +1,14 @@
+torch>=2.1
+torchvision>=0.16
+numpy
+pandas
+scikit-learn
+Pillow
+joblib
+
+# optional -- confusion-matrix heatmaps / training curve plots
+matplotlib
+seaborn
+
+# optional -- Grad-CAM examples in legacy/superseded_scripts/ensemble_meta_classifier.py
+# grad-cam
